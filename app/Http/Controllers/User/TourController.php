@@ -64,6 +64,8 @@ class TourController extends Controller
         $pagesFooterInfo = $this->pageRepository->getPagesForFooterInfo();
         $dates = $this->tourRepository->getCalendarTableForTour($id);
 
+        dd(__METHOD__, $tour);
+
         if (!empty($tour) == true && $tour->is_published == true) {
             return view('frontend.page.tour', compact('tour', 'pageItems',
                 'data', 'pagesFooterInfo', 'dates'));

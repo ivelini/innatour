@@ -1,6 +1,6 @@
 @extends('admin.layouts.main')
 @section('scripts-for-page')
-	<script src="/global_assets/js/plugins/editors/summernote/summernote.min.js"></script>
+	<script src="/global_assets/js/plugins/editors/ckeditor/ckeditor.js"></script>
 	<script src="/global_assets/js/plugins/forms/styling/uniform.min.js"></script>
 
 	<script src="/global_assets/js/plugins/uploaders/fileinput/plugins/purify.min.js"></script>
@@ -139,7 +139,7 @@
 												  rows="5"
 												  cols="3"
 												  class="form-control"
-												  id="summernote">{{ old('description', $tour->description) }}</textarea>
+												  id="editor-full">{{ old('description', $tour->description) }}</textarea>
 									</div>
 								</div>
 								<div class="form-group row">
@@ -394,8 +394,36 @@
 @endsection
 @section('script')
 	<script>
-		$(document).ready(function() {
-			$('#summernote').summernote();
+		var CKEditor = function() {
+			var _componentCKEditor = function() {
+				if (typeof CKEDITOR == 'undefined') {
+					console.warn('Warning - ckeditor.js is not loaded.');
+					return;
+				}
+				CKEDITOR.replace('editor-full', {
+					height: 250,
+					extraPlugins: 'forms',
+					toolbar: [
+						{ name: 'basicstyles', groups: [ 'basicstyles', 'cleanup' ], items: [ 'Bold', 'Italic', 'RemoveFormat' ] },
+						{ name: 'paragraph', groups: [ 'list', 'indent', 'blocks', 'align', 'bidi' ], items: [ 'NumberedList', 'BulletedList', '-', 'Blockquote', 'CreateDiv', '-', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', '-', 'BidiLtr', 'BidiRtl', 'Language' ] },
+						{ name: 'insert', items: [ 'Image', 'Table', 'Link', 'Unlink', 'SpecialChar', '-', 'Undo', 'Redo' ] },
+						'/',
+						{ name: 'styles', items: [ 'Format', 'Font', 'FontSize' ] },
+						{ name: 'tools', items: [ 'Maximize', 'ShowBlocks' ] },
+						{ name: 'document', groups: [ 'mode', 'document', 'doctools' ], items: [ 'Source' ] },
+						{ name: 'clipboard', groups: [ 'clipboard', 'undo' ], items: ['PasteText' ] }
+					]
+				});
+			};
+
+			return {
+				init: function() {
+					_componentCKEditor();
+				}
+			}
+		}();
+		document.addEventListener('DOMContentLoaded', function() {
+			CKEditor.init();
 		});
 	</script>
 	<script>
