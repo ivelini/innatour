@@ -69,6 +69,7 @@ class CategoryRepository extends CoreRepository
             ])
             ->first()
             ->tours;
+
         return $tours;
     }
 

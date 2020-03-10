@@ -1,7 +1,7 @@
 @extends('frontend.layouts.main')
 @section('head-component')
 	<title>{{ $tour->title }}</title>
-	<meta name="description" content="{{ \Illuminate\Support\Str::limit($tour->description, 200) }}" />
+	<meta name="description" content="{{ $tour->head_description }}" />
 	<meta name="keywords" content="{{ $tour->title }}" />
 	<link rel="stylesheet" type="text/css" href="/frontend/slick/slick.css"/>
 	<link rel="stylesheet" type="text/css" href="/frontend/slick/slick-theme.css"/>

@@ -45,8 +45,15 @@ class TourRepository extends CoreRepository
             ->select('id', 'title', 'slug', 'description', 'is_published', 'price', 'sale', 'file_path', 'file_name')
             ->where('id', $id)
             ->with('categories:id,title', 'gallery:id,tour_id,path,is_header')
-            ->first();
+            ->get();
 
+        $tour = $tour->map(function ($item) {
+                    $item->head_description = Str::limit(strip_tags($item->description), 200);
+                    return $item;
+                })
+                ->first();
+
+//         dd(__METHOD__, $tour);
         return $tour;
     }
 
