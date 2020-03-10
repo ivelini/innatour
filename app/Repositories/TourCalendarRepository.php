@@ -34,10 +34,10 @@ class TourCalendarRepository extends CoreRepository
             ->where('start', '>=', Date::now())
             ->orderBy('start')
             ->with(['tour' => function ($query) {
-                $query->select('id', 'title', 'price', 'sale', 'scope_id', 'is_published')
+                $query->select('id', 'title', 'slug', 'price', 'sale', 'scope_id', 'is_published')
                     ->where('is_published', true);
                 },
-                'tour.categories:id,title'])
+                'tour.categories:id,title,slug'])
             ->get();
 
         Carbon::setLocale('ru');
@@ -57,12 +57,15 @@ class TourCalendarRepository extends CoreRepository
             $year = $dtStart->year;
             $tour_id = $date->tour_id;
             $tour_title = $date->tour->title;
+            $tour_slug = $date->tour->slug;
             $price = $date->tour->price;
             $sale = $date->tour->sale;
             $cat_id = $date->tour->categories->first()->id;
             $cat_title = $date->tour->categories->first()->title;
+            $cat_slug = $date->tour->categories->first()->slug;
             $scope_id = $date->tour->scope->id;
             $scope_title = $date->tour->scope->title;
+            $scope_slug = $date->tour->scope->slug;
             $rasspisanie = $dtStart->isoFormat('D MMMM'). ' - ' .$dtFinish->isoFormat('D MMMM');
             $comment = $date->comment;
 
@@ -70,13 +73,16 @@ class TourCalendarRepository extends CoreRepository
                 'date' => $rasspisanie,
                 'tour_id' => $tour_id,
                 'tour_title' => $tour_title,
+                'tour_slug' => $tour_slug,
                 'price' => $price,
                 'sale' => $sale,
                 'count_days' => $count_days,
                 'cat_id' => $cat_id,
                 'cat_title' => $cat_title,
+                'cat_slug' => $cat_slug,
                 'scope_id' => $scope_id,
                 'scope_title' => $scope_title,
+                'scope_slug' => $scope_slug,
                 'comment' => $comment
             ];
 

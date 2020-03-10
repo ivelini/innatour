@@ -24,7 +24,16 @@ class ScopeController extends Controller
         $this->scopeRepository = new ScopeRepository();
     }
 
-    public function indexCurrentScope($id) {
+    public function indexCurrentScope($slug) {
+        if (is_numeric($slug)) {
+            $id = $slug;
+            $scope = $this->scopeRepository->getEdit($id);
+
+            return redirect(route('scope.indexCurrentScope', $scope->slug), 301);
+        }
+        else {
+            $id =  $this->scopeRepository->getIdAcopeFromSlug($slug);
+        }
 
         $scope = $this->scopeRepository->getEdit($id);
         $tours = $this->scopeRepository->getAllPublishedTourCurrentScope($id);

@@ -55,11 +55,11 @@
                                                                 @foreach($dates[$year][$month] as $date)
                                                                     <tr>
                                                                         <th scope="row">{{ $date['date'] }}</th>
-                                                                        <td><a class="link-info" href="{{ route('tour.show', $date['tour_id']) }}">{{ $date['tour_title'] }}</a></td>
-                                                                        <td><a href="{{ route('category.indexCurrentCategory', $date['cat_id']) }}">{{ $date['cat_title'] }}</td></td>
+                                                                        <td><a class="link-info" href="{{ route('tour.show', $date['tour_slug']) }}">{{ $date['tour_title'] }}</a></td>
+                                                                        <td><a href="{{ route('category.indexCurrentCategory', $date['cat_slug']) }}">{{ $date['cat_title'] }}</td></td>
                                                                         <td>
                                                                             @if($date['scope_id'] > 0)
-                                                                                <a href="{{ route('scope.indexCurrentScope', $date['scope_id']) }}">{{ $date['scope_title'] }}
+                                                                                <a href="{{ route('scope.indexCurrentScope', $date['scope_slug']) }}">{{ $date['scope_title'] }}
                                                                             @endif
                                                                         </td>
                                                                         <td>{{ $date['count_days'] }}</td>

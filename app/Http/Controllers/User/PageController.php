@@ -21,8 +21,18 @@ class PageController extends Controller
         $this->tourRepository = new TourRepository();
     }
 
-    public function show($id)
+    public function show($slug)
     {
+        if (is_numeric($slug)) {
+            $id = $slug;
+            $page = $this->pageRepository->getShowPage($id);
+
+            return redirect(route('page.show', $page->slug), 301);
+        }
+        else {
+            $id =  $this->pageRepository->getIdPageFromSlug($slug);
+        }
+
         $page = $this->pageRepository->getShowPage($id);
         $pageItems = $this->pageRepository->getPagesItemsForIndex();
         $data = $this->settingsRepository->getSettingsData();

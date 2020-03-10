@@ -72,4 +72,14 @@ class ScopeRepository extends CoreRepository
         return $tours;
     }
 
+    public function getIdAcopeFromSlug($slug) {
+        $id = $this->startConditions()
+            ->select('id', 'slug')
+            ->where('slug', $slug)
+            ->pluck('id')
+            ->first();
+
+        return $id;
+    }
+
 }

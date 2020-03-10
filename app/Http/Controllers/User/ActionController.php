@@ -31,7 +31,7 @@ class ActionController extends Controller
         DB::table('clients')->insert($data);
 
         return redirect()
-            ->route('tour.show', $id)
+            ->route('tour.show', $request->slug)
             ->with(['success' => 'Сообщение отправлено']);
     }
 }

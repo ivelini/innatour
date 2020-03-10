@@ -83,7 +83,7 @@ class PageRepository extends CoreRepository
     public function getPagesItemsForIndex()
     {
         $pages = $this->startConditions()
-            ->select('id', 'nav_name', 'title', 'location', 'is_published')
+            ->select('id', 'nav_name', 'title', 'slug', 'location', 'is_published')
             ->where('is_published', true)
             ->where('location', '=', 'top_menu')
             ->with(['gallery' => function ($query) {
@@ -119,5 +119,15 @@ class PageRepository extends CoreRepository
             ->first();
 
         return $page;
+    }
+
+    public function getIdPageFromSlug($slug) {
+        $id = $this->startConditions()
+            ->select('id', 'slug')
+            ->where('slug', $slug)
+            ->pluck('id')
+            ->first();
+
+        return $id;
     }
 }

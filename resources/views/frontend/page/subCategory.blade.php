@@ -38,7 +38,7 @@
 														<div class="tripadvisor-module">
 															<div class="hover-underline" style="height: 12px"></div>
 															<div class="texting">
-																<a class="alert-link" href="{{ route('tour.show', $tour->id) }}">Подробнее</a>
+																<a class="alert-link" href="{{ route('tour.show', $tour->slug) }}">Подробнее</a>
 															</div>
 
 														</div>
@@ -61,30 +61,32 @@
 							<div class="col-sm-6"></div>
 
 							<div class="col-sm-6">
+
+								@php dd($_GET['page']); @endphp
 								@if ($paginate['toursCount'] > $paginate['countToursForPage'])
 									<ul class="paging">
 										@if(!empty($_GET['page']) && $_GET['page'] == 1)
 											<li class="disable"><a href="#">&laquo;</a></li>
 										@elseif(!empty($_GET['page']) && $_GET['page'] != 1)
-											<li><a href="{{ route('category.indexCurrentCategory', $category->id) }}?page={{ $_GET['page'] - 1 }}">&laquo;</a></li>
+											<li><a href="{{ route('category.indexCurrentCategory', $category->slug) }}?page={{ $_GET['page'] - 1 }}">&laquo;</a></li>
 										@elseif(empty($_GET['page']))
-											<li class="disable"><a href="{{ route('category.indexCurrentCategory', $category->id) }}">&laquo;</a></li>
+											<li class="disable"><a href="{{ route('category.indexCurrentCategory', $category->slug) }}">&laquo;</a></li>
 										@endif
 										@if(empty($_GET['page']))
 											@for($i = 1; $i <= $paginate['countPaginate']; $i++)
-												<li {{ $i == 1 ? printf('class="active"') : ''}}><a href="{{ route('category.indexCurrentCategory', $category->id) }}?page={{ $i }}">{{ $i }}</a></li>
+												<li {{ $i == 1 ? printf('class="active"') : ''}}><a href="{{ route('category.indexCurrentCategory', $category->slug) }}?page={{ $i }}">{{ $i }}</a></li>
 											@endfor
 										@elseif(!empty($_GET['page']))
 											@for($i = 1; $i <= $paginate['countPaginate']; $i++)
-												<li {{ $i == $_GET['page'] ? printf('class="active"') : ''}}><a href="{{ route('category.indexCurrentCategory', $category->id) }}?page={{ $i }}">{{ $i }}</a></li>
+												<li {{ $i == $_GET['page'] ? printf('class="active"') : ''}}><a href="{{ route('category.indexCurrentCategory', $category->slug) }}?page={{ $i }}">{{ $i }}</a></li>
 											@endfor
 										@endif
 										@if(!empty($_GET['page']) && $_GET['page'] == $paginate['countPaginate'])
 											<li class="disable"><a href="#">&raquo;</a></li>
 										@elseif(!empty($_GET['page']) && $_GET['page'] != $paginate['countPaginate'])
-											<li><a href="{{ route('category.indexCurrentCategory', $category->id) }}?page={{ $_GET['page'] + 1 }}">&raquo;</a></li>
+											<li><a href="{{ route('category.indexCurrentCategory', $category->slug) }}?page={{ $_GET['page'] + 1 }}">&raquo;</a></li>
 										@elseif(empty($_GET['page']))
-											<li><a href="{{ route('category.indexCurrentCategory', $category->id) }}?page=2">&raquo;</a></li>
+											<li><a href="{{ route('category.indexCurrentCategory', $category->slug) }}?page=2">&raquo;</a></li>
 										@endif
 									</ul>
 								@endif

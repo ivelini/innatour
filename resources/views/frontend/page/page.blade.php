@@ -27,7 +27,7 @@
                                 </div>
                             @endif
                             <div class="content">
-                                <h3 class="blog-title">{{ $page->title }}</h3>
+                                <h1 class="blog-title">{{ $page->title }}</h1>
 
                                 <div class="blog-entry">
                                     {!! $page->description !!}

@@ -47,7 +47,7 @@
 									@if ($catItem->children->count() > 0 || $catItem->tours->count() > 0)
 										<div class="col-xss-12 col-xs-12 col-sm-6 col-mdd-6 col-md-4" data-match-height="result-grid">
 											<div class="hotel-item-grid">
-												<a href="{{ route('category.indexCurrentCategory', $catItem->id) }}">
+												<a href="{{ route('category.indexCurrentCategory', $catItem->slug) }}">
 													<div class="image">
 														@if(!empty($catItem->gallery->first()->path))
 															<img src="{{ asset('/storage/') }}{{ !empty($catItem->gallery->first()->path) ? '/' .$catItem->gallery->first()->path : '' }}">
@@ -73,7 +73,7 @@
 										@foreach($tours as $tour)
 											<div class="col-xss-12 col-xs-12 col-sm-6 col-mdd-6 col-md-4" data-match-height="result-grid">
 												<div class="hotel-item-grid">
-													<a href="{{ route('tour.show', $tour->id) }}">
+													<a href="{{ route('tour.show', $tour->slug) }}">
 														<div class="image">
 															@if(!empty($tour->gallery->first()->path))
 																<img src="{{ asset('/storage/' .$tour->gallery->first()->path) }}">
@@ -91,7 +91,7 @@
 																	<div class="tripadvisor-module">
 																		<div class="hover-underline" style="height: 12px"></div>
 																		<div class="texting">
-																			<a class="alert-link" href="{{ route('tour.show', $tour->id) }}">Подробнее</a>
+																			<a class="alert-link" href="{{ route('tour.show', $tour->slug) }}">Подробнее</a>
 																		</div>
 
 																	</div>
@@ -120,25 +120,25 @@
 										@if(!empty($_GET['page']) && $_GET['page'] == 1)
 											<li class="disable"><a href="#">&laquo;</a></li>
 										@elseif(!empty($_GET['page']) && $_GET['page'] != 1)
-											<li><a href="{{ route('category.indexCurrentCategory', $category->id) }}?page={{ $_GET['page'] - 1 }}">&laquo;</a></li>
+											<li><a href="{{ route('category.indexCurrentCategory', $category->slug) }}?page={{ $_GET['page'] - 1 }}">&laquo;</a></li>
 										@elseif(empty($_GET['page']))
-											<li class="disable"><a href="{{ route('category.indexCurrentCategory', $category->id) }}">&laquo;</a></li>
+											<li class="disable"><a href="{{ route('category.indexCurrentCategory', $category->slug) }}">&laquo;</a></li>
 										@endif
 										@if(empty($_GET['page']))
 											@for($i = 1; $i <= $paginate['countPaginate']; $i++)
-												<li {{ $i == 1 ? printf('class="active"') : ''}}><a href="{{ route('category.indexCurrentCategory', $category->id) }}?page={{ $i }}">{{ $i }}</a></li>
+												<li {{ $i == 1 ? printf('class="active"') : ''}}><a href="{{ route('category.indexCurrentCategory', $category->slug) }}?page={{ $i }}">{{ $i }}</a></li>
 											@endfor
 										@elseif(!empty($_GET['page']))
 											@for($i = 1; $i <= $paginate['countPaginate']; $i++)
-												<li {{ $i == $_GET['page'] ? printf('class="active"') : ''}}><a href="{{ route('category.indexCurrentCategory', $category->id) }}?page={{ $i }}">{{ $i }}</a></li>
+												<li {{ $i == $_GET['page'] ? printf('class="active"') : ''}}><a href="{{ route('category.indexCurrentCategory', $category->slug) }}?page={{ $i }}">{{ $i }}</a></li>
 											@endfor
 										@endif
 										@if(!empty($_GET['page']) && $_GET['page'] == $paginate['countPaginate'])
 											<li class="disable"><a href="#">&raquo;</a></li>
 										@elseif(!empty($_GET['page']) && $_GET['page'] != $paginate['countPaginate'])
-											<li><a href="{{ route('category.indexCurrentCategory', $category->id) }}?page={{ $_GET['page'] + 1 }}">&raquo;</a></li>
+											<li><a href="{{ route('category.indexCurrentCategory', $category->slug) }}?page={{ $_GET['page'] + 1 }}">&raquo;</a></li>
 										@elseif(empty($_GET['page']))
-											<li><a href="{{ route('category.indexCurrentCategory', $category->id) }}?page=2">&raquo;</a></li>
+											<li><a href="{{ route('category.indexCurrentCategory', $category->slug) }}?page=2">&raquo;</a></li>
 										@endif
 									</ul>
 								@endif

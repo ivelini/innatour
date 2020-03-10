@@ -15,7 +15,7 @@
                     @if($pageItems->count() > 0)
                         @foreach($pageItems as $page)
                             <li>
-                                <a href="{{ route('page.show', $page->id) }}" style="color:#ff8c5e; font-weight:bold;">{{ $page->nav_name }}</a>
+                                <a href="{{ route('page.show', $page->slug) }}" style="color:#ff8c5e; font-weight:bold;">{{ $page->nav_name }}</a>
                             </li>
                         @endforeach
                     @endif

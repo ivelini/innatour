@@ -21,8 +21,18 @@ class CategoryController extends Controller
         $this->settingsRepository = new SettingsRepository();
     }
 
-    public function indexCurrentCategory($id)
+    public function indexCurrentCategory($slug)
     {
+        if (is_numeric($slug)) {
+            $id = $slug;
+            $category = $this->categoryRepository->getEdit($id);
+
+            return redirect(route('category.indexCurrentCategory', $category->slug), 301);
+        }
+        else {
+            $id =  $this->categoryRepository->getIdCategoryFromSlug($slug);
+        }
+
         $category = $this->categoryRepository->getEdit($id);
         $childCats = $this->categoryRepository->childrenCategories($category);
         $tours = $this->categoryRepository->getAllPublishedTourCurrentCategory($id);
@@ -35,8 +45,6 @@ class CategoryController extends Controller
         $pagesFooterInfo = $this->pageRepository->getPagesForFooterInfo();
 
         $tours = $tours->forPage( $paginate['currentPage'], $paginate['countToursForPage']);
-
-//        dd(__METHOD__, $category);
 
         return view('frontend.page.category', compact('tours', 'paginate',
             'category',

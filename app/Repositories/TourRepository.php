@@ -44,7 +44,7 @@ class TourRepository extends CoreRepository
         $tour = $this->startConditions()
             ->select('id', 'title', 'slug', 'description', 'is_published', 'price', 'sale', 'file_path', 'file_name')
             ->where('id', $id)
-            ->with('categories:id,title', 'gallery:id,tour_id,path,is_header')
+            ->with('categories:id,title,slug', 'gallery:id,tour_id,path,is_header')
             ->get();
 
         $tour = $tour->map(function ($item) {
@@ -53,7 +53,6 @@ class TourRepository extends CoreRepository
                 })
                 ->first();
 
-//         dd(__METHOD__, $tour);
         return $tour;
     }
 
@@ -148,6 +147,16 @@ class TourRepository extends CoreRepository
             ->toArray();
 
         return $tours;
+    }
+
+    public function getIdTourFromSlug($slug) {
+        $id = $this->startConditions()
+            ->select('id', 'slug')
+            ->where('slug', $slug)
+            ->pluck('id')
+            ->first();
+
+        return $id;
     }
 
 }

@@ -63,6 +63,7 @@
 					</div>
 					<form class="contact-form" method="POST" action="{{ route('tour.show.sendMessage', $tour->id) }}">
 						@csrf
+						<input type="hidden" name="slug" value="{{ $tour->slug }}">
 
 						@include('admin.layouts.message')
 

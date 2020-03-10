@@ -61,13 +61,13 @@ Route::group(['namespace' => 'User'], function () {
     Route::get('tour', 'TourController@index')
         ->name('tour.index');
 
-    Route::get('tour/{tour}', 'TourController@show')
+    Route::get('tour/{slug}', 'TourController@show')
         ->name('tour.show');
 
-    Route::get('category/{category}', 'CategoryController@indexCurrentCategory')
+    Route::get('category/{slug}', 'CategoryController@indexCurrentCategory')
         ->name('category.indexCurrentCategory');
 
-    Route::get('scope/{scope}', 'ScopeController@indexCurrentScope')
+    Route::get('scope/{slug}', 'ScopeController@indexCurrentScope')
         ->name('scope.indexCurrentScope');
 
     Route::get('/', 'TourController@index')
@@ -76,6 +76,8 @@ Route::group(['namespace' => 'User'], function () {
     Route::post('tour/{tour}', 'ActionController@sendTourFormMessage')
         ->name('tour.show.sendMessage');
 
-    Route::get('page/{page}', 'PageController@show')
+    Route::get('page/{slug}', 'PageController@show')
         ->name('page.show');
+
+    Route::get('test', 'TourController@test');
 });

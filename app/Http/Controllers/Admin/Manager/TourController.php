@@ -337,13 +337,38 @@ class TourController extends Controller
         foreach ($imgFiles as $img) {
             $uploadsDir = 'uploads/tour_' . $tour->id . '/img';
             Storage::disk('public')->makeDirectory($uploadsDir);
-            $path = $uploadsDir . '/' . Str::random(15) . '.jpg';
+            $path = $uploadsDir . '/' . Str::random(15);
+            $pathCrop = $path . '_crop';
 
-            Image::make($img)->save(storage_path() . '/app/public/' . $path, 90);
+            $itemImgFull = Image::make($img);
+            $itemImgCrop = clone $itemImgFull;
+            $imgData = $itemImgCrop->exif();
+            $imgWidth = $imgData['COMPUTED']['Width'];
+            $imgHeight = $imgData['COMPUTED']['Height'];
+
+            $ratio = 1.65;
+            $imgRatio = round($imgWidth / $imgHeight, 2);
+
+            if ($imgRatio < $ratio) {
+                $imgHeightCrop = round($imgWidth / $ratio, 0);
+                $itemImgCrop->crop($imgWidth, $imgHeightCrop, 0, round(($imgHeight -$imgHeightCrop) / 2, 0));
+            }
+            elseif ($imgRatio > $ratio) {
+                $imgWidthCrop = round($imgHeight * $ratio, 0);
+                $itemImgCrop->crop($imgWidthCrop, $imgHeight, round(($imgWidth - $imgWidthCrop) / 2, 0), 0);
+            }
+
+            $itemImgCrop->resize(300, null, function ($constraint) {
+                $constraint->aspectRatio();
+            });
+
+            $itemImgCrop->save(storage_path() . '/app/public/' . $pathCrop . '.jpg', 90);
+            $itemImgFull->save(storage_path() . '/app/public/' . $path . '.jpg', 90);
+
             if ($i == 0) {
-                $paths[] = new Gallery(['path' => $path, 'is_header' => true]);
+                $paths[] = new Gallery(['path' => $path . '.jpg', 'is_header' => true]);
             } else {
-                $paths[] = new Gallery(['path' => $path]);
+                $paths[] = new Gallery(['path' => $path . '.jpg']);
             }
             $i++;
         }

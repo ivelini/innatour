@@ -82,7 +82,7 @@
 										<div class="GridLex-col-3_sm-4_xs-6_xss-12 mb-20">
 
 											<div class="hotel-item-grid alt-no-rating">
-												<a href="{{ route('category.indexCurrentCategory', $category->id) }}">
+												<a href="{{ route('category.indexCurrentCategory', $category->slug) }}">
 													<div class="image">
 														<img src="{{ asset('/storage/') }}{{ !empty($category->gallery->first()->path) ? '/' .$category->gallery->first()->path : '' }}">
 													</div>
