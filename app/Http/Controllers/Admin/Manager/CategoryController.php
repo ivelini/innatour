@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin\Manager;
 
+use App\Helpers\ImageHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CategoryRequest;
 use App\Models\Category;
@@ -11,7 +12,6 @@ use App\Repositories\CategoryRepository;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use Intervention\Image\Facades\Image;
 
 class CategoryController extends Controller
 {
@@ -34,7 +34,6 @@ class CategoryController extends Controller
 
         if ($user->can('index', Category::class)) {
             $categories = $this->categoryRepository->getAllCategoriesForHierarchicalView();
-//            $hierarchicalCat= $this->categoryRepository->getAllCategoriesForHierarchicalView();
             $delimiter = '';
 
             return view('admin.page.manager.tour.categoryList', compact('categories', 'delimiter'));
@@ -59,7 +58,12 @@ class CategoryController extends Controller
 
             $img = $request->file('cat_img');
             if ($img) {
-                $this->saveImgFile($img, $category);
+                $imageHelper = new ImageHelper();
+                $path = $imageHelper->saveImgFile($img, $category);
+
+                $path = new Gallery(['path' => $path . '.jpg']);
+                $category->gallery()->delete();
+                $category->gallery()->save($path);
             }
 
             return redirect()
@@ -92,7 +96,12 @@ class CategoryController extends Controller
 
         $img = $request->file('cat_img');
         if ($img) {
-            $this->saveImgFile($img, $category);
+            $imageHelper = new ImageHelper();
+            $path = $imageHelper->saveImgFile($img, $category);
+
+            $path = new Gallery(['path' => $path . '.jpg']);
+            $category->gallery()->delete();
+            $category->gallery()->save($path);
         }
 
         return redirect()
@@ -124,43 +133,5 @@ class CategoryController extends Controller
                 ->route('manager.category.index')
                 ->with(['success' => 'Категория удалена']);
         }
-    }
-
-    protected function saveImgFile($img, $category)
-    {
-
-        $uploadsDir = 'uploads/category_' . $category->id . '/img';
-        Storage::disk('public')->makeDirectory($uploadsDir);
-        $path = $uploadsDir . '/' . Str::random(15);
-        $pathCrop = $path . '_crop';
-
-        $itemImgFull = Image::make($img);
-        $itemImgCrop = clone $itemImgFull;
-        $imgData = $itemImgCrop->exif();
-        $imgWidth = $imgData['COMPUTED']['Width'];
-        $imgHeight = $imgData['COMPUTED']['Height'];
-
-        $ratio = 1.65;
-        $imgRatio = round($imgWidth / $imgHeight, 2);
-
-        if ($imgRatio < $ratio) {
-            $imgHeightCrop = round($imgWidth / $ratio, 0);
-            $itemImgCrop->crop($imgWidth, $imgHeightCrop, 0, round(($imgHeight -$imgHeightCrop) / 2, 0));
-        }
-        elseif ($imgRatio > $ratio) {
-            $imgWidthCrop = round($imgHeight * $ratio, 0);
-            $itemImgCrop->crop($imgWidthCrop, $imgHeight, round(($imgWidth - $imgWidthCrop) / 2, 0), 0);
-        }
-
-        $itemImgCrop->resize(400, null, function ($constraint) {
-            $constraint->aspectRatio();
-        });
-
-        $itemImgCrop->save(storage_path() . '/app/public/' . $pathCrop . '.jpg', 90);
-        $itemImgFull->save(storage_path() . '/app/public/' . $path . '.jpg', 90);
-        $path = new Gallery(['path' => $path . '.jpg']);
-
-        $category->gallery()->delete();
-        $category->gallery()->save($path);
     }
 }

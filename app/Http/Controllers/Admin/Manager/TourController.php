@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin\Manager;
 
+use App\Helpers\ImageHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\TourAddRequest;
 use App\Http\Requests\TourUpdateRequest;
@@ -191,7 +192,7 @@ class TourController extends Controller
         if ($user->can('viewAny', Tour::class)) {
             $tour = $this->tourRepository->getEdit($id);
             $selectCategories = $this->tourRepository->getSelectCategories($tour);
-            $photos = $this->tourRepository->getAllPhotos($tour);
+            $photos = $this->tourRepository->getAllPhotos($tour, 'small');
             $user = $this->tourRepository->getUser($tour);
             $categories = $this->categoryRepository->getAllCategoriesForHierarchicalView();
             $dates = $this->tourCalendarRepository->getAllDatesForTour($id);
@@ -246,7 +247,7 @@ class TourController extends Controller
 
         $galleryHeaderPhotoId = $request->input('GalleryHeaderPhotoId');
         if ($galleryHeaderPhotoId) {
-            $photos = $this->tourRepository->getAllPhotos($tour);
+            $photos = $this->tourRepository->getAllPhotos($tour, 'medium');
             $photoIsHeader = $photos
                 ->where('is_header', true)
                 ->first();
@@ -334,36 +335,9 @@ class TourController extends Controller
 
     protected function saveImgFile($imgFiles, $tour, $i = 1)
     {
+        $imageHelper = new ImageHelper();
         foreach ($imgFiles as $img) {
-            $uploadsDir = 'uploads/tour_' . $tour->id . '/img';
-            Storage::disk('public')->makeDirectory($uploadsDir);
-            $path = $uploadsDir . '/' . Str::random(15);
-            $pathCrop = $path . '_crop';
-
-            $itemImgFull = Image::make($img);
-            $itemImgCrop = clone $itemImgFull;
-            $imgData = $itemImgCrop->exif();
-            $imgWidth = $imgData['COMPUTED']['Width'];
-            $imgHeight = $imgData['COMPUTED']['Height'];
-
-            $ratio = 1.65;
-            $imgRatio = round($imgWidth / $imgHeight, 2);
-
-            if ($imgRatio < $ratio) {
-                $imgHeightCrop = round($imgWidth / $ratio, 0);
-                $itemImgCrop->crop($imgWidth, $imgHeightCrop, 0, round(($imgHeight -$imgHeightCrop) / 2, 0));
-            }
-            elseif ($imgRatio > $ratio) {
-                $imgWidthCrop = round($imgHeight * $ratio, 0);
-                $itemImgCrop->crop($imgWidthCrop, $imgHeight, round(($imgWidth - $imgWidthCrop) / 2, 0), 0);
-            }
-
-            $itemImgCrop->resize(300, null, function ($constraint) {
-                $constraint->aspectRatio();
-            });
-
-            $itemImgCrop->save(storage_path() . '/app/public/' . $pathCrop . '.jpg', 90);
-            $itemImgFull->save(storage_path() . '/app/public/' . $path . '.jpg', 90);
+            $path = $imageHelper->saveImgFile($img, $tour);
 
             if ($i == 0) {
                 $paths[] = new Gallery(['path' => $path . '.jpg', 'is_header' => true]);

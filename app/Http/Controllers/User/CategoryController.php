@@ -34,6 +34,7 @@ class CategoryController extends Controller
         }
 
         $category = $this->categoryRepository->getEdit($id);
+        $category = $this->categoryRepository->getPathCropLargeImgForCategories($category);
         $childCats = $this->categoryRepository->childrenCategories($category);
         $tours = $this->categoryRepository->getAllPublishedTourCurrentCategory($id);
         $paginate['toursCount'] = $tours->count();

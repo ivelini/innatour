@@ -9,6 +9,14 @@ use Illuminate\Support\Str;
 
 class CategoryRepository extends CoreRepository
 {
+    protected $tourRepository;
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->tourRepository = new TourRepository();
+    }
+
     public function getModelClass()
     {
         return Model::class;
@@ -16,7 +24,12 @@ class CategoryRepository extends CoreRepository
 
     public function getEdit($id)
     {
-        return $this->startConditions()->find($id);
+        $category = $this->startConditions()
+            ->select('id', 'title', 'slug', 'description', 'parent_id', 'description_img')
+            ->where('id', $id)
+            ->first();
+
+        return $category;
     }
 
     public function isIdenticalTitle($title, $id = false)
@@ -49,7 +62,7 @@ class CategoryRepository extends CoreRepository
             ->where('parent_id', 0)
             ->get();
 
-        $categories = $this->getPathCropImgForCategories($categories);
+        $categories = $this->getPathCropSmallImgForCategories($categories);
 
         return $categories;
 
@@ -73,6 +86,8 @@ class CategoryRepository extends CoreRepository
             ->first()
             ->tours;
 
+        $tours = $this->tourRepository->getPathCropImgForTours($tours);
+
         return $tours;
     }
 
@@ -85,7 +100,7 @@ class CategoryRepository extends CoreRepository
             ->orderBy('title')
             ->get();
 
-        $categories = $this->getPathCropImgForCategories($categories);
+        $categories = $this->getPathCropSmallImgForCategories($categories);
 
         foreach ($categories as $category) {
             if ($category->tours->count() > 0) {
@@ -110,7 +125,7 @@ class CategoryRepository extends CoreRepository
             }, 'children:id,parent_id', 'tours:id,category_id'])
             ->get();
 
-        $childCats = $this->getPathCropImgForCategories($childCats);
+        $childCats = $this->getPathCropSmallImgForCategories($childCats);
 
         return $childCats;
     }
@@ -125,10 +140,14 @@ class CategoryRepository extends CoreRepository
         return $id;
     }
 
-    protected function getPathCropImgForCategories($categories) {
+    /**
+     * @param $categories
+     * @return mixed
+     */
+    protected function getPathCropSmallImgForCategories($categories) {
         $categories->map(function ($item) {
             $path = $item->gallery->first()->path;
-            $pathCrop = substr($path, 0, stripos($path, '.')) . '_crop.jpg';
+            $pathCrop = substr($path, 0, stripos($path, '.')) . '_small.jpg';
 
             if (Storage::disk('public')->exists($pathCrop)) {
                 $item->gallery->first()->path = $pathCrop;
@@ -138,7 +157,7 @@ class CategoryRepository extends CoreRepository
             if ($childCategories->count() > 0) {
                 $childCategories->map(function ($itemChild) {
                     $path = $itemChild->gallery->first()->path;
-                    $pathCrop = substr($path, 0, stripos($path, '.')) . '_crop.jpg';
+                    $pathCrop = substr($path, 0, stripos($path, '.')) . '_small.jpg';
 
                     if (Storage::disk('public')->exists($pathCrop)) {
                         $itemChild->gallery->first()->path = $pathCrop;
@@ -151,5 +170,21 @@ class CategoryRepository extends CoreRepository
         });
 
         return $categories;
+    }
+
+
+    /**
+     * @param $category
+     * @return mixed
+     */
+    public function getPathCropLargeImgForCategories($category) {
+        $path = $category->gallery->first()->path;
+        $pathCrop = substr($path, 0, stripos($path, '.')) . '_large.jpg';
+
+        if (Storage::disk('public')->exists($pathCrop)) {
+            $category->gallery->first()->path = $pathCrop;
+        }
+
+        return $category;
     }
 }

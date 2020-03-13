@@ -98,11 +98,33 @@ class MainController extends Controller
         $i = 0;
         $j = 0;
         $flag = true;
+        $ratio = 3.4;
         while ($flag == true) {
             if (!empty($img[$i])) {
-                $path = $uploadsDir . '/' . Str::random(15) . '.jpg';
-                Image::make($img[$i])->save(storage_path() . '/app/public/' . $path, 90);
-                $paths[$i] = $path;
+                $path = $uploadsDir . '/' . Str::random(15);
+
+                $itemImg = Image::make($img[$i]);
+                $imgData = $itemImgCrop->exif();
+                $imgWidth = $imgData['COMPUTED']['Width'];
+                $imgHeight = $imgData['COMPUTED']['Height'];
+
+                $imgRatio = round($imgWidth / $imgHeight, 2);
+
+                if ($imgRatio < $ratio) {
+                    $imgHeightCrop = round($imgWidth / $ratio, 0);
+                    $itemImg->crop($imgWidth, $imgHeightCrop, 0, round(($imgHeight - $imgHeightCrop) / 2, 0));
+                } elseif ($imgRatio > $ratio) {
+                    $imgWidthCrop = round($imgHeight * $ratio, 0);
+                    $itemImg->crop($imgWidthCrop, $imgHeight, round(($imgWidth - $imgWidthCrop) / 2, 0), 0);
+                }
+
+                $itemImg->resize(1800, null, function ($constraint) {
+                    $constraint->aspectRatio();
+                });
+
+                $itemImg->save(storage_path() . '/app/public/' . $path . '.jpg', 90);
+                $paths[$i] = $path . '.jpg';
+
                 $i++;
             } else {
                 $j++;

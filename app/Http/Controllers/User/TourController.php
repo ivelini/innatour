@@ -67,12 +67,14 @@ class TourController extends Controller
             $id =  $this->tourRepository->getIdTourFromSlug($slug);
         }
         $tour = $this->tourRepository->getShowTour($id);
+        $tour = $this->tourRepository->getPathSizeImgesForTour($tour, 'medium');
         $pageItems = $this->pageRepository->getPagesItemsForIndex();
         $data = $this->settingsRepository->getSettingsData();
         $pagesFooterInfo = $this->pageRepository->getPagesForFooterInfo();
         $dates = $this->tourRepository->getCalendarTableForTour($id);
 
         if (!empty($tour) == true && $tour->is_published == true) {
+//            dd(__METHOD__,$tour->gallery);
             return view('frontend.page.tour', compact('tour', 'pageItems',
                 'data', 'pagesFooterInfo', 'dates'));
         }
@@ -117,14 +119,10 @@ class TourController extends Controller
                     $constraint->aspectRatio();
                 });
 
-//                dd(__METHOD__,$path);
-
                 $itemImgCrop->save(storage_path() . '/app/' . $pathCrop . '.jpg', 90);
                 $itemImgFull->save(storage_path() . '/app/' . $path . '.jpg', 90);
 
-//                dd(__METHOD__,$path);
             }
         }
-        echo 'ok';
     }
 }

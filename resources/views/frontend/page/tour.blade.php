@@ -1,5 +1,11 @@
 @extends('frontend.layouts.main')
 @section('head-component')
+	<meta property="og:title" content="{{ $tour->title }}"/>
+	<meta property="og:description" content="{{ $tour->head_description }}"/>
+{{--	<meta property="og:image" content="{{ asset('/storage/' .$tour->gallery->filter(function ($value) {return $value['is_header'] == true;})->first()->path) }}"/>--}}
+	<meta property="og:type" content="website" />
+	<meta property="og:url" content= "https:/{{ $_SERVER['HTTP_HOST'] }}{{ $_SERVER['REQUEST_URI'] }}" />
+	
 	<title>{{ $tour->title }}</title>
 	<meta name="description" content="{{ $tour->head_description }}" />
 	<meta name="keywords" content="{{ $tour->title }}" />

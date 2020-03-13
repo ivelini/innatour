@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Models\Tour as Model;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class TourRepository extends CoreRepository
@@ -65,14 +66,20 @@ class TourRepository extends CoreRepository
         return $categories;
     }
 
-    public function getAllPhotos($tour)
+    public function getAllPhotos($tour, $size)
     {
         $photos = $tour->gallery()
             ->select('id', 'tour_id', 'path', 'is_header')
             ->orderBy('id', 'ASC')
             ->get();
 
-        return $photos;
+        $photos->map(function ($item) use ($size) {
+            $path = $item->path;
+            $item->path = substr($path, 0, stripos($path, '.')) . '_' . $size . '.jpg';
+            return $item;
+        });
+
+       return $photos;
     }
 
     public function getUser($tour)
@@ -159,4 +166,29 @@ class TourRepository extends CoreRepository
         return $id;
     }
 
+    public function getPathCropImgForTours($tours) {
+        $tours->map(function ($item) {
+            $path = $item->gallery->first()->path;
+            $pathCrop = substr($path, 0, stripos($path, '.')) . '_crop.jpg';
+
+            if (Storage::disk('public')->exists($pathCrop)) {
+                $item->gallery->first()->path = $pathCrop;
+                return $item;
+            }
+
+            return $item;
+        });
+
+        return $tours;
+    }
+
+    public function getPathSizeImgesForTour($tour, $size) {
+        $tour->gallery->map(function ($item) use ($size) {
+            $path = $item->path;
+            $item->path = substr($path, 0, stripos($path, '.')) . '_' . $size . '.jpg';
+            return $item;
+        });
+
+        return $tour;
+    }
 }
