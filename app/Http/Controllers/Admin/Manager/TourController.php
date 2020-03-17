@@ -69,13 +69,17 @@ class TourController extends Controller
             ->with(['categories' => function ($query) use ($id) {
                 $query->select('id', 'title')
                     ->where('id', $id);
-            }])
+            },
+                'gallery' => function ($query) use ($id) {
+                    $query->select('id', 'tour_id', 'path', 'is_header')
+                        ->where('is_header', 'true');
+                }])
             ->get()
             ->filter(function ($value) {
                 return $value->categories->isNotEmpty();
             });
 
-//        dd($tours);
+        $tours = $this->tourRepository->getPathSizeImgForTours($tours, 'small');
 
         return view('admin.page.manager.tour.list', compact('tours'));
     }
@@ -86,7 +90,11 @@ class TourController extends Controller
             ->with(['scope' => function ($query) use ($id) {
                 $query->select('id', 'title')
                     ->where('id', $id);
-            }])
+            },
+                'gallery' => function ($query) use ($id) {
+                    $query->select('id', 'tour_id', 'path', 'is_header')
+                        ->where('is_header', 'true');
+                }])
             ->get()
             ->filter(function ($value) {
                 if (!empty($value->scope)) {
@@ -96,6 +104,8 @@ class TourController extends Controller
                     return false;
                 }
             });
+
+        $tours = $this->tourRepository->getPathSizeImgForTours($tours, 'small');
 
         return view('admin.page.manager.tour.list', compact('tours'));
     }
@@ -246,25 +256,21 @@ class TourController extends Controller
         }
 
         $galleryHeaderPhotoId = $request->input('GalleryHeaderPhotoId');
-        if ($galleryHeaderPhotoId) {
-            $photos = $this->tourRepository->getAllPhotos($tour, 'medium');
-            $photoIsHeader = $photos
-                ->where('is_header', true)
-                ->first();
-            if (empty($photoIsHeader)) {
-                $photo = Gallery::find($galleryHeaderPhotoId);
-                $photo->is_header = true;
-                $photo->save();
-            } else {
-                if ($photoIsHeader->id != $galleryHeaderPhotoId) {
-                    $photoIsHeader->is_header = false;
-                    $photoIsHeader->save();
+        $currentHeaderPhotoId = $this->tourRepository->getCurrentIdHeaderPhoto($tour);
 
-                    $photo = Gallery::find($galleryHeaderPhotoId);
-                    $photo->is_header = true;
-                    $photo->save();
-                }
-            }
+        if(!empty($galleryHeaderPhotoId) && !empty($currentHeaderPhotoId) && ($galleryHeaderPhotoId != $currentHeaderPhotoId)) {
+            $currentGallery = $this->galleryRepository->getEdit($currentHeaderPhotoId);
+            $currentGallery->is_header = false;
+            $currentGallery->save();
+
+            $headerGallery = $this->galleryRepository->getEdit($galleryHeaderPhotoId);
+            $headerGallery->is_header = true;
+            $headerGallery->save();
+        }
+        elseif (!empty($galleryHeaderPhotoId) && empty($currentHeaderPhotoId)) {
+            $headerGallery = $this->galleryRepository->getEdit($galleryHeaderPhotoId);
+            $headerGallery->is_header = true;
+            $headerGallery->save();
         }
 
         $deletePhotoId = $request->input('deletePhoto');
@@ -353,8 +359,25 @@ class TourController extends Controller
     protected function deleteImgFile($deletePhotoId)
     {
         $paths = $this->galleryRepository->getPathsPhotos($deletePhotoId);
+        $pathDir = 'public/' .substr($paths[0] , 0, strripos($paths[0], '/'));
+
+        $files = Storage::allFiles($pathDir);
         foreach ($paths as $path) {
-            Storage::disk('public')->delete($path);
+            foreach ($files as $file) {
+                $imgName = substr($path, strripos($path, '/') + 1);
+                $imgName = substr($imgName, 0, strripos($imgName, '.'));
+                $posCount = strpos($file, $imgName);
+                if (strpos($file, $imgName) != false) {
+                    $deleteFiles[] = $file;
+                }
+                }
+
+            if($deleteFiles) {
+                foreach ($deleteFiles as $item) {
+                    $item = substr($item, strpos($item, '/') +1);
+                    Storage::disk('public')->delete($item);
+                }
+            }
         }
         Gallery::destroy($deletePhotoId);
     }

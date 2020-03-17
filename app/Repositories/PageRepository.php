@@ -105,8 +105,6 @@ class PageRepository extends CoreRepository
             }])
             ->get();
 
-//        dd(__METHOD__,$pages);
-
         return $pages;
     }
 
@@ -115,7 +113,7 @@ class PageRepository extends CoreRepository
         $page = $this->startConditions()
             ->select('id', 'title', 'slug', 'nav_name', 'description', 'is_published')
             ->where('id', $id)
-            ->with('gallery')
+            ->with('gallery:id,page_id,path')
             ->first();
 
         return $page;

@@ -49,10 +49,10 @@ class TourRepository extends CoreRepository
             ->get();
 
         $tour = $tour->map(function ($item) {
-                    $item->head_description = Str::limit(strip_tags($item->description), 200);
-                    return $item;
-                })
-                ->first();
+            $item->head_description = Str::limit(strip_tags($item->description), 200);
+            return $item;
+        })
+            ->first();
 
         return $tour;
     }
@@ -64,6 +64,22 @@ class TourRepository extends CoreRepository
             ->get();
 
         return $categories;
+    }
+
+    public function getCurrentIdHeaderPhoto($tour)
+    {
+        $idHeaderPhoto = $tour->gallery
+            ->first(function($item) {
+                if ($item->is_header == 'true') {
+                    return true;
+                }
+            });
+
+        if (!empty($idHeaderPhoto)) {
+            $idHeaderPhoto = $idHeaderPhoto->id;
+        }
+
+        return $idHeaderPhoto;
     }
 
     public function getAllPhotos($tour, $size)
@@ -79,7 +95,7 @@ class TourRepository extends CoreRepository
             return $item;
         });
 
-       return $photos;
+        return $photos;
     }
 
     public function getUser($tour)
@@ -108,6 +124,8 @@ class TourRepository extends CoreRepository
                     $query->select('id', 'title');
                 }])
             ->get();
+
+        $tours = $this->getPathSizeImgForTours($tours, 'small');
 
         return $tours;
     }
@@ -156,7 +174,8 @@ class TourRepository extends CoreRepository
         return $tours;
     }
 
-    public function getIdTourFromSlug($slug) {
+    public function getIdTourFromSlug($slug)
+    {
         $id = $this->startConditions()
             ->select('id', 'slug')
             ->where('slug', $slug)
@@ -166,28 +185,38 @@ class TourRepository extends CoreRepository
         return $id;
     }
 
-    public function getPathCropImgForTours($tours) {
-        $tours->map(function ($item) {
+    public function getPathSizeImgForTours($tours, $size)
+    {
+        $tours->map(function ($item) use ($size) {
             $path = $item->gallery->first()->path;
-            $pathCrop = substr($path, 0, stripos($path, '.')) . '_crop.jpg';
-
-            if (Storage::disk('public')->exists($pathCrop)) {
-                $item->gallery->first()->path = $pathCrop;
-                return $item;
-            }
-
+            $item->gallery->first()->path = substr($path, 0, strripos($path, '.jpg')) . '_' . $size . '.jpg';
             return $item;
         });
 
         return $tours;
     }
 
-    public function getPathSizeImgesForTour($tour, $size) {
+    public function getPathSizeImgesForTour($tour, $size)
+    {
         $tour->gallery->map(function ($item) use ($size) {
             $path = $item->path;
             $item->path = substr($path, 0, stripos($path, '.')) . '_' . $size . '.jpg';
             return $item;
         });
+
+        return $tour;
+    }
+
+    public function assignIs_headerPathImage($tour) {
+        $is_header = $tour->gallery->first(function ($item) {
+            if ($item->is_header) {
+                return true;
+            }
+        });
+
+        if (empty($is_header)) {
+            $tour->gallery->first()->is_header = true;
+        }
 
         return $tour;
     }

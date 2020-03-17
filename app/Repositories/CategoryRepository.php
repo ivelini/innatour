@@ -86,7 +86,7 @@ class CategoryRepository extends CoreRepository
             ->first()
             ->tours;
 
-        $tours = $this->tourRepository->getPathCropImgForTours($tours);
+        $tours = $this->tourRepository->getPathSizeImgForTours($tours, 'small');
 
         return $tours;
     }

@@ -68,13 +68,14 @@ class TourController extends Controller
         }
         $tour = $this->tourRepository->getShowTour($id);
         $tour = $this->tourRepository->getPathSizeImgesForTour($tour, 'medium');
+        $tour = $this->tourRepository->assignIs_headerPathImage($tour);
         $pageItems = $this->pageRepository->getPagesItemsForIndex();
         $data = $this->settingsRepository->getSettingsData();
         $pagesFooterInfo = $this->pageRepository->getPagesForFooterInfo();
         $dates = $this->tourRepository->getCalendarTableForTour($id);
 
         if (!empty($tour) == true && $tour->is_published == true) {
-//            dd(__METHOD__,$tour->gallery);
+
             return view('frontend.page.tour', compact('tour', 'pageItems',
                 'data', 'pagesFooterInfo', 'dates'));
         }
@@ -88,40 +89,52 @@ class TourController extends Controller
 
         foreach ($files as $item) {
             $format = substr($item, stripos($item, '.'));
-            if ($format == '.jpg') {
-                $path = \Storage::path($item);
-                $img = \Image::make($path);
 
+            if ($format == '.jpg') {
+                $path = substr($item, 0, strripos($item, '.'));
                 $uploadsDir = substr($item, 0, strripos($item, '/'));
                 \Storage::disk('public')->makeDirectory($uploadsDir);
-                $path = $uploadsDir . '/' . $img->filename;
-                $pathCrop = $path . '_crop';
 
-                $itemImgFull = $img;
+                $itemImgFull = \Image::make(\Storage::path($item));
                 $itemImgCrop = clone $itemImgFull;
                 $imgData = $itemImgCrop->exif();
                 $imgWidth = $imgData['COMPUTED']['Width'];
                 $imgHeight = $imgData['COMPUTED']['Height'];
 
-                $ratio = 1.65;
                 $imgRatio = round($imgWidth / $imgHeight, 2);
 
-                if ($imgRatio < $ratio) {
-                    $imgHeightCrop = round($imgWidth / $ratio, 0);
-                    $itemImgCrop->crop($imgWidth, $imgHeightCrop, 0, round(($imgHeight -$imgHeightCrop) / 2, 0));
-                }
-                elseif ($imgRatio > $ratio) {
-                    $imgWidthCrop = round($imgHeight * $ratio, 0);
-                    $itemImgCrop->crop($imgWidthCrop, $imgHeight, round(($imgWidth - $imgWidthCrop) / 2, 0), 0);
-                }
+                $size = [
+                    'small' => 400,
+                    'medium' => 800
+                ];
 
-                $itemImgCrop->resize(400, null, function ($constraint) {
-                    $constraint->aspectRatio();
-                });
+                $ratio = 1.65;
+                $nameModel = 'category';
+                do {
+                    if ($imgRatio < $ratio) {
+                        $imgHeightCrop = round($imgWidth / $ratio, 0);
+                        $itemImgCrop->crop($imgWidth, $imgHeightCrop, 0, round(($imgHeight - $imgHeightCrop) / 2, 0));
+                    } elseif ($imgRatio > $ratio) {
+                        $imgWidthCrop = round($imgHeight * $ratio, 0);
+                        $itemImgCrop->crop($imgWidthCrop, $imgHeight, round(($imgWidth - $imgWidthCrop) / 2, 0), 0);
+                    }
 
-                $itemImgCrop->save(storage_path() . '/app/' . $pathCrop . '.jpg', 90);
-                $itemImgFull->save(storage_path() . '/app/' . $path . '.jpg', 90);
+                    foreach ($size as $key => $item) {
+                        $itemImgCropSize = clone $itemImgCrop;
+                        $itemImgCropSize->resize($item, null, function ($constraint) {
+                            $constraint->aspectRatio();
+                        });
+                        $pathCrop = $path . '_' . $key;
+                        $itemImgCropSize->save(storage_path() . '/app/public/' . $pathCrop . '.jpg', 90);
+                    }
 
+                    if (key($size) == 'large') {
+                        break;
+                    }
+                    $itemImgCrop = clone $itemImgFull;
+                    $ratio = 3.5;
+                    $size = ['large' => 1800];
+                } while ($nameModel == 'category');
             }
         }
     }

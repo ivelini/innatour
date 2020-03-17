@@ -104,7 +104,7 @@ class MainController extends Controller
                 $path = $uploadsDir . '/' . Str::random(15);
 
                 $itemImg = Image::make($img[$i]);
-                $imgData = $itemImgCrop->exif();
+                $imgData = $itemImg->exif();
                 $imgWidth = $imgData['COMPUTED']['Width'];
                 $imgHeight = $imgData['COMPUTED']['Height'];
 

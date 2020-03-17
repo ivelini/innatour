@@ -20,4 +20,12 @@ class GalleryRepository extends CoreRepository
         return $paths;
     }
 
+    public function getEdit($id) {
+        $gallery = $this->startConditions()
+            ->select('id', 'tour_id', 'category_id', 'page_id', 'path', 'is_header')
+            ->where('id', $id)
+            ->first();
+
+        return $gallery;
+    }
 }

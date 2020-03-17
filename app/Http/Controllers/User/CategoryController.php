@@ -21,7 +21,7 @@ class CategoryController extends Controller
         $this->settingsRepository = new SettingsRepository();
     }
 
-    public function indexCurrentCategory($slug)
+    public function show($slug)
     {
         if (is_numeric($slug)) {
             $id = $slug;

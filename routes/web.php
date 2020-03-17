@@ -64,7 +64,7 @@ Route::group(['namespace' => 'User'], function () {
     Route::get('tour/{slug}', 'TourController@show')
         ->name('tour.show');
 
-    Route::get('category/{slug}', 'CategoryController@indexCurrentCategory')
+    Route::get('category/{slug}', 'CategoryController@show')
         ->name('category.indexCurrentCategory');
 
     Route::get('scope/{slug}', 'ScopeController@indexCurrentScope')
