@@ -27,7 +27,7 @@ class PageRequest extends FormRequest
             'nav_name' => 'required',
             'title' => 'required',
             'description' => 'required',
-            'pageImg' => 'required|mimes:jpeg,jpg,bmp,png|max:1024|dimensions:min_width:800,min_height:600'
+            'pageImg' => 'mimes:jpeg,jpg,bmp,png|max:1024|dimensions:min_width:800,min_height:600'
         ];
     }
 }

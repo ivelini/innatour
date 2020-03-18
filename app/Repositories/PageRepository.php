@@ -97,7 +97,7 @@ class PageRepository extends CoreRepository
     public function getPagesForFooterInfo()
     {
         $pages = $this->startConditions()
-            ->select('id', 'nav_name', 'title', 'location', 'is_published')
+            ->select('id', 'nav_name', 'title', 'slug', 'location', 'is_published')
             ->where('is_published', true)
             ->where('location', '=', 'footer_info')
             ->with(['gallery' => function ($query) {

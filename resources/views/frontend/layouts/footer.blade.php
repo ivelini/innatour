@@ -41,11 +41,10 @@
                         <ul class="menu-footer">
                             @if($pagesFooterInfo->count() > 0)
                                 @foreach($pagesFooterInfo as $page)
-                                    <li><a href="{{ route('page.show', $page->id) }}">{{ $page->nav_name }}</a></li>
+                                    <li><a href="{{ route('page.show', $page->slug) }}">{{ $page->nav_name }}</a></li>
                                 @endforeach
                             @endif
                         </ul>
-
                     </div>
 
                     <div class="col-xss-12 col-xs-4 col-sm-3 mt-30-xs">
@@ -66,15 +65,9 @@
                                     <li><a href="{{  $data['siteInsta'] }}">INSTAGRAMM</a></li>
                                 @endif
                         </ul>
-
                     </div>
-
                 </div>
-
             </div>
-
         </div>
-
     </div>
-
 </footer>

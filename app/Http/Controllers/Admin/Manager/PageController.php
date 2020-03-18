@@ -122,7 +122,7 @@ class PageController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(PageRequest $request, $id)
     {
         $data = $request->except(['pageImg']);
         if (empty($request->input('is_published'))) {

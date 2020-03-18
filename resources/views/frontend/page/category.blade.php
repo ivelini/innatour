@@ -1,5 +1,11 @@
 @extends('frontend.layouts.main')
 @section('head-component')
+	<meta property="og:title" content="{{ $category->title }}"/>
+	<meta property="og:image" content="{{ asset('/storage/') }}{{ !empty($category->gallery->first()->path_og) ? '/' .$category->gallery->first()->path_og : '' }}"/>
+	<meta property="og:type" content="website" />
+	<meta property="og:description" content="{{ \Illuminate\Support\Str::limit($category->description, 200) }}"/>
+	<meta property="og:url" content= "https://{{ $_SERVER['HTTP_HOST'] }}{{ $_SERVER['REQUEST_URI'] }}" />
+
 	<title>{{ $category->title }}</title>
 	<meta name="description" content="{{ \Illuminate\Support\Str::limit($category->description, 200) }}" />
 	<meta name="keywords" content="{{ $category->title }}" />
@@ -54,7 +60,7 @@
 														@endif
 													</div>
 													<div class="head" style="padding: 20px">
-														<h4>{{ $catItem->title }}</h4>
+														<div class="class-h4">{{ $catItem->title }}</div>
 													</div>
 													<div style="padding: 20px">{{ $catItem->description }}</div>
 												</a>
@@ -80,7 +86,7 @@
 															@endif
 														</div>
 														<div class="heading">
-															<h4>{{ $tour->title }}</h4>
+															<div class="class-h4">{{ $tour->title }}</div>
 															<div style="padding: 20px">{{ $tour->description_cat }}</div>
 														</div>
 

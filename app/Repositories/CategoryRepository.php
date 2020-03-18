@@ -44,14 +44,23 @@ class CategoryRepository extends CoreRepository
         }
     }
 
-    public function getAllCategories()
+    public function getAllCategoriesAndToursForSitemap()
     {
-        $categories = $this->startConditions()
-            ->select('id', 'parent_id', 'title', 'description')
-            ->with(['tours:id', 'gallery:id,category_id,path', 'children'])
-            ->get();
+        $sitemap = $this->startConditions()
+            ->select('id', 'parent_id', 'title', 'slug')
+            ->with(['tours' => function($query) {
+                $query->select('id', 'title', 'slug', 'is_published')
+                    ->where('is_published', true);
+            },
+            'children.tours' => function($query) {
+                $query->select('id', 'title', 'slug', 'is_published')
+                    ->where('is_published', true);
+            }])
+            ->where('parent_id', 0)
+            ->get()
+            ->toArray();
 
-        return $categories;
+        return $sitemap;
     }
 
     public function getAllCategoriesForHierarchicalView()
@@ -96,21 +105,22 @@ class CategoryRepository extends CoreRepository
         $categories = $this->startConditions()
             ->select('id', 'parent_id', 'title', 'description', 'slug')
             ->where('parent_id', 0)
-            ->with(['tours', 'gallery:id,category_id,path'])
+            ->with(['tours' => function($query) {
+                    $query->select('id', 'title', 'slug', 'description_cat', 'price', 'sale', 'is_published')
+                        ->where('is_published', true);
+                },
+                'gallery:id,category_id,path',
+                'children'])
             ->orderBy('title')
             ->get();
 
+        $categories = $categories->filter(function ($item) {
+            if ($item->tours->count() > 0 || $item->children->count() > 0) {
+                return true;
+            };
+        });
+
         $categories = $this->getPathCropSmallImgForCategories($categories);
-
-        foreach ($categories as $category) {
-            if ($category->tours->count() > 0) {
-                $notEmptyCategories[] = $category;
-            }
-        }
-
-        if (empty($notEmptyCategories)) {
-            $notEmptyCategories = null;
-        }
 
         return $categories;
 
@@ -120,10 +130,23 @@ class CategoryRepository extends CoreRepository
     {
         $childCats = $category->children()
             ->select('id', 'title', 'slug', 'description')
-            ->with(['gallery' => function($query) {
-                $query->select('id', 'category_id', 'path');
-            }, 'children:id,parent_id', 'tours:id,category_id'])
+            ->with([
+                'gallery' => function($query) {
+                    $query->select('id', 'category_id', 'path');
+                    },
+                'children:id,parent_id',
+                'tours' => function($query) {
+                    $query->select('id', 'title', 'slug', 'description_cat', 'price', 'sale', 'is_published')
+                        ->where('is_published', true);
+                    },
+            ])
             ->get();
+
+        $childCats = $childCats->filter(function ($item) {
+            if ($item->tours->count() > 0 || $item->children->count() > 0) {
+                return true;
+            };
+        });
 
         $childCats = $this->getPathCropSmallImgForCategories($childCats);
 
@@ -184,6 +207,13 @@ class CategoryRepository extends CoreRepository
         if (Storage::disk('public')->exists($pathCrop)) {
             $category->gallery->first()->path = $pathCrop;
         }
+
+        return $category;
+    }
+
+    public function setPatImgForOpenGraph($category) {
+        $path = $category->gallery->first()->path;
+        $category->gallery->first()->path_og = substr($path, 0, strripos($path, '.jpg')) . '_medium.jpg';
 
         return $category;
     }

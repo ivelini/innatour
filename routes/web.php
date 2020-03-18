@@ -78,6 +78,4 @@ Route::group(['namespace' => 'User'], function () {
 
     Route::get('page/{slug}', 'PageController@show')
         ->name('page.show');
-
-    Route::get('test', 'TourController@test');
 });

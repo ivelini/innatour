@@ -1,10 +1,10 @@
 @extends('frontend.layouts.main')
 @section('head-component')
 	<meta property="og:title" content="{{ $tour->title }}"/>
-	<meta property="og:description" content="{{ $tour->head_description }}"/>
-{{--	<meta property="og:image" content="{{ asset('/storage/' .$tour->gallery->filter(function ($value) {return $value['is_header'] == true;})->first()->path) }}"/>--}}
+	<meta property="og:image" content="{{ asset('/storage/' .$tour->gallery->filter(function ($value) {return $value['is_header'] == true;})->first()->path) }}"/>
 	<meta property="og:type" content="website" />
-	<meta property="og:url" content= "https:/{{ $_SERVER['HTTP_HOST'] }}{{ $_SERVER['REQUEST_URI'] }}" />
+	<meta property="og:description" content="{{ $tour->head_description }}"/>
+	<meta property="og:url" content= "https://{{ $_SERVER['HTTP_HOST'] }}{{ $_SERVER['REQUEST_URI'] }}" />
 	
 	<title>{{ $tour->title }}</title>
 	<meta name="description" content="{{ $tour->head_description }}" />
@@ -27,7 +27,7 @@
 					<div class="mb-10"></div>
 
 					<div class="section-title">
-						<h3><span>Информация</span></h3>
+						<div class="class-h3"><span>Информация</span></div>
 					</div>
 
 					<ul class="sidebar-cat clearfix mb-30 mmt">
@@ -40,7 +40,7 @@
 				</aside>
 				<aside>
 					<div class="section-title">
-						<h3><span>Расписание</span></h3>
+						<div class="class-h3"><span>Расписание</span></div>
 					</div>
 					<table class="table table-hover table-sm table-bordered">
 						<tbody>
@@ -65,7 +65,7 @@
 				</aside>
 				<aside>
 					<div class="section-title">
-						<h3><span>Забронировать</span></h3>
+						<div class="class-h3"><span>Забронировать</span></div>
 					</div>
 					<form class="contact-form" method="POST" action="{{ route('tour.show.sendMessage', $tour->id) }}">
 						@csrf
@@ -158,7 +158,7 @@
 									@endforeach
 								</div>
 							</div>
-							<h3 class="blog-title">{{ $tour->title }}</h3>
+							<h1 class="blog-title">{{ $tour->title }}</h1>
 
 							<div class="blog-entry">
 								{!! $tour->description !!}

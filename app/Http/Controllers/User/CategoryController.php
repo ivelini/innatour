@@ -23,6 +23,7 @@ class CategoryController extends Controller
 
     public function show($slug)
     {
+        $this->categoryRepository->getAllCategoriesAndToursForSitemap();
         if (is_numeric($slug)) {
             $id = $slug;
             $category = $this->categoryRepository->getEdit($id);
@@ -34,6 +35,7 @@ class CategoryController extends Controller
         }
 
         $category = $this->categoryRepository->getEdit($id);
+        $category = $this->categoryRepository->setPatImgForOpenGraph($category);
         $category = $this->categoryRepository->getPathCropLargeImgForCategories($category);
         $childCats = $this->categoryRepository->childrenCategories($category);
         $tours = $this->categoryRepository->getAllPublishedTourCurrentCategory($id);
